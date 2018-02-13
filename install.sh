@@ -7,4 +7,4 @@ cd $(dirname $0)
 if [[ ! -d .venv ]]; then
     virtualenv --no-site-packages .venv
 fi
-.venv/bin/pip install -U --upgrade-strategy only-if-needed -r requirements.txt
+./.venv/bin/pip install -U --upgrade-strategy only-if-needed -r requirements.txt

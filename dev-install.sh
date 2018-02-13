@@ -5,5 +5,5 @@ set -o errexit
 
 cd $(dirname $0)
 ./install.sh
-./venv/bin/pip install -U --upgrade-strategy only-if-needed -r dev-requirements.txt
+./.venv/bin/pip install -U --upgrade-strategy only-if-needed -r dev-requirements.txt
 
