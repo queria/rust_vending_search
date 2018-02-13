@@ -18,6 +18,6 @@ table { border-collapse: collapse; }
 table th, table td { padding: 0.3em; border: 1px solid gray; }
 
 ul.offers {}
-li.offer { margin-top: 2em; }
+li.offer { margin-top: 0.1em; }
 li.offer > strong { text-decoration: underline; }
 
