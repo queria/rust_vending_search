@@ -49,37 +49,63 @@ class MainView(handlers.BaseHandler):
         try:
             addr = self._arg('addr', '')
             # now try to parse/fetch addr
-            server_name = ''
+            server_info = ''
+            offers = []
             vending_machines = []
 
             if addr:
-                # TODO(queria): friendly handling of fetching/parsing issues
-                status = requests.get('http://%s/status.json' % addr).json()
-                monuments = requests.get(
-                    'http://%s/monuments.json' % addr).json()
                 # TODO(queria): caching of these responses for certain time
                 # to not hit any server too often
+                server_info = self.fetch_server_info(addr)
+                offers, vending_machines = self.fetch_offers_and_machines(addr)
 
-                server_name = '%s - %d/%d' % (status['hostname'],
-                                              status['players'],
-                                              status['maxplayers'])
-                vending_machines = [m for m in monuments
-                                    if m['name'] == "vendingmachine.deployed"]
                 # TODO(queria): sorting of offers
-                # also convert from list of machines to list of individual
-                # orders ... or split into two lists?
 
             if not addr:
                 addr = '217.182.199.20:28019'
             return self.render_response(
                 'index.html',
                 server_addr=addr,
-                server_name=server_name,
+                server_info=server_info,
+                offers=offers,
                 vending_machines=vending_machines)
 
         except Exception as e:
             return self.render_response('exception.html',
                                         exc=traceback.format_exc(e))
+
+    def fetch_offers_and_machines(self, addr):
+        # TODO(queria): friendly handling of fetching/parsing issues
+        monuments = requests.get(
+            'http://%s/monuments.json' % addr).json()
+        vending_machines_tmp = [m for m in monuments
+                                if m['name'] == "vendingmachine.deployed"]
+        offers = []
+        vending_machines = {}
+        for machine in vending_machines_tmp:
+            offers_tmp = machine.pop('goods')
+            vending_machines[id(machine)] = machine
+            for offer in offers_tmp:
+                offer['machineId'] = id(machine)
+            offers += offers_tmp
+        return (offers, vending_machines)
+
+    def fetch_server_info(self, addr):
+        try:
+            status = requests.get('http://%s/status.json' % addr).json()
+            return ('%s - %d/%d' % (
+                status['hostname'],
+                status['players'],
+                status['maxplayers']))
+        # TODO(queria): more friendly handling of fetching/parsing issues
+        # when i know what kind of things can be wrong,
+        # and make Exception catching more class specific
+        # then use just:
+        # except SomeExceptionLike404:
+        #  server_name = ''
+        # for cases which mean server does not support this extension
+        except Exception as e:
+            return str(e)
 
 url_map = [
     url('', MainView, name='index'),

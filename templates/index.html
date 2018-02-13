@@ -1,7 +1,7 @@
 @extends("layout.html")
 
 @def content():
-@require(path_for, server_addr, server_name, vending_machines)
+@require(path_for, server_addr, server_info, offers, vending_machines)
 
 <div class="serverForm">
     <form method="get" enctype="text/plain">
@@ -14,16 +14,16 @@
 
 @if vending_machines:
 
-    <h1>Offers from @server_name</h1>
+    <h1>Offers from @server_info</h1>
 
     <ul class="offers">
-        @for machine in vending_machines:
+        @for offer in offers:
             <li class="offer">
-                @str(machine)
+                @str(offer)
             </li>
         @end
     </ul>
-@elif server_name:
+@elif server_info:
     <p>No vending machines found for this server!</p>
 @else:
 
