@@ -16,10 +16,20 @@
 
     <h1>Offers from @server_info</h1>
 
+    <div>
+        Sort by:
+        @# TODO(queria): dynamic asc/desc flipping, highligh active, likely when(if) i go with table tag instead of list
+        <a href="?addr=@server_addr!h&amp;sortby=item&order=asc">item name</a> &nbsp;|&nbsp;
+        <a href="?addr=@server_addr!h&amp;sortby=itemAmount&order=asc">item amount</a> &nbsp;|&nbsp;
+        <a href="?addr=@server_addr!h&amp;sortby=currency&order=asc">price item name</a> &nbsp;|&nbsp;
+        <a href="?addr=@server_addr!h&amp;sortby=currencyAmount&order=asc">price amount</a>
+        <a href="?addr=@server_addr!h&amp;sortby=inStock&order=asc">available items</a>
+    </div>
+
     <ul class="offers">
         @for offer in offers:
-            <li class="offer">
-                @str(offer)
+            <li class="offer" title="@str(vending_machines[offer['machineId']])">
+                @str(offer['itemAmount']) &times; @offer['item'] &nbsp; for &nbsp; @str(offer['currencyAmount']) &times @offer['currency']  (@str(offer['inStock']) available)
             </li>
         @end
     </ul>

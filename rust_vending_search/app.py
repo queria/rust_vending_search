@@ -6,6 +6,7 @@
 # import datetime
 import locale
 import logging
+from operator import itemgetter
 import requests
 import traceback
 
@@ -59,7 +60,14 @@ class MainView(handlers.BaseHandler):
                 server_info = self.fetch_server_info(addr)
                 offers, vending_machines = self.fetch_offers_and_machines(addr)
 
-                # TODO(queria): sorting of offers
+                # TODO(queria): advanced sorting
+                # eg always item name + by price/currency/etc
+                sort_by = self._arg('sortby', 'item')
+                order = self._arg('order', 'asc')
+                if offers and sort_by in offers[0].keys():
+                    offers = sorted(offers,
+                                    key=itemgetter(sort_by),
+                                    reverse=(order == 'desc'))
 
             if not addr:
                 addr = '217.182.199.20:28019'
