@@ -1,0 +1,4 @@
+wheezy.web>=0.1.373
+wheezy.template>=0.1.135
+wheezy.caching>=0.1.91
+requests>=2.18.4

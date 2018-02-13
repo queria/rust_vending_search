@@ -1,0 +1,9 @@
+@extends("layout.html")
+
+@def content():
+@require(path_for, exc)
+<h1>Internal error</h1>
+<div class="error">
+    Unexpected internal error occured, sorry:
+    <pre>@exc</pre>
+</div>

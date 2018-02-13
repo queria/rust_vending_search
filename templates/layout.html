@@ -1,0 +1,17 @@
+@require(path_for)
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Rust Vending Machine Search</title>
+        <link href="@path_for('static', path='site.css')"
+            type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <h1><a href="@path_for('index')">Rust Vending Machine Search</a></h1>
+        <div id="main">
+            @def content():
+            @end
+            @content()
+        </div>
+    </body>
+</html>

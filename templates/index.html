@@ -1,0 +1,31 @@
+@extends("layout.html")
+
+@def content():
+@require(path_for, server_addr, server_name, vending_machines)
+
+<div class="serverForm">
+    <form method="get" enctype="text/plain">
+    <label>
+        IP:port of Rust server
+        <input type="text" name="addr" value="@str(server_addr)!h" />
+    </label>
+    <input type="submit" value="Fetch Vending Machine list" />
+</div>
+
+@if vending_machines:
+
+    <h1>Offers from @server_name</h1>
+
+    <ul class="offers">
+        @for machine in vending_machines:
+            <li class="offer">
+                @str(machine)
+            </li>
+        @end
+    </ul>
+@elif server_name:
+    <p>No vending machines found for this server!</p>
+@else:
+
+@end
+
