@@ -8,6 +8,7 @@ import locale
 import logging
 from operator import itemgetter
 import requests
+import socket
 import traceback
 
 from rust_vending_search import config
@@ -42,19 +43,20 @@ class MainView(handlers.BaseHandler):
         self._r = request
 
     def _arg(self, field, default=''):
-        LOG.debug(self._r)
         val = self._r.query.get(field, [default])
         return val[0]
 
     def get(self):
+        addr = ''
+        # now try to parse/fetch addr
+        server_info = ''
+        offers = []
+        vending_machines = []
         try:
             addr = self._arg('addr', '')
-            # now try to parse/fetch addr
-            server_info = ''
-            offers = []
-            vending_machines = []
 
             if addr:
+                self.validate_address(addr)
                 # TODO(queria): caching of these responses for certain time
                 # to not hit any server too often
                 server_info = self.fetch_server_info(addr)
@@ -78,6 +80,10 @@ class MainView(handlers.BaseHandler):
                 offers=offers,
                 vending_machines=vending_machines)
 
+        except InvalidServerAddress as e:
+            return self.render_response(
+                'bad_address.html',
+                exc=e)
         except Exception as e:
             return self.render_response('exception.html',
                                         exc=traceback.format_exc(e))
@@ -85,7 +91,7 @@ class MainView(handlers.BaseHandler):
     def fetch_offers_and_machines(self, addr):
         # TODO(queria): friendly handling of fetching/parsing issues
         monuments = requests.get(
-            'http://%s/monuments.json' % addr).json()
+            'http://%s/monuments.json' % addr, timeout=10).json()
         vending_machines_tmp = [m for m in monuments
                                 if m['name'] == "vendingmachine.deployed"]
         offers = []
@@ -100,7 +106,7 @@ class MainView(handlers.BaseHandler):
 
     def fetch_server_info(self, addr):
         try:
-            status = requests.get('http://%s/status.json' % addr).json()
+            status = requests.get('http://%s/status.json' % addr, timeout=10).json()
             return ('%s - %d/%d' % (
                 status['hostname'],
                 status['players'],
@@ -114,6 +120,23 @@ class MainView(handlers.BaseHandler):
         # for cases which mean server does not support this extension
         except Exception as e:
             return str(e)
+
+    def validate_address(self, addr):
+        # TODO(queria): replace with more sofisticated check (ipv6 in rust?)
+        LOG.debug('Validating user specified address %s', addr)
+        parts = addr.split(':')
+        try:
+            socket.getaddrinfo(parts[0], parts[1])
+        except (IndexError, socket.error, socket.herror, socket.gaierror,
+                socket.timeout):
+            raise InvalidServerAddress(addr)
+
+
+class InvalidServerAddress(Exception):
+    def __init__(self, addr):
+        super(InvalidServerAddress, self).__init__(
+            'Invalid address specified: %s' % addr)
+
 
 url_map = [
     url('', MainView, name='index'),

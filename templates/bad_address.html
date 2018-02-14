@@ -1,0 +1,8 @@
+@extends("layout.html")
+
+@def content():
+@require(path_for, exc)
+<h1>Invalid input</h1>
+<div class="error">
+    <pre>@str(exc)</pre>
+</div>
