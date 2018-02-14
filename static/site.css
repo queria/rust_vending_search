@@ -12,6 +12,8 @@ span.error-message {
 span.error-message { border:1px solid #C44509;
     background: no-repeat scroll 2px 50% #fdcea4; }
 
+#footer { text-align: right; color: #999; font-size: small; }
+
 .serverForm label { display: inline; }
 
 table { border-collapse: collapse; }
